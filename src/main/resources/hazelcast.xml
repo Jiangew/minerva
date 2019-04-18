@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hazelcast.com/schema/config
+           http://www.hazelcast.com/schema/config/hazelcast-config-3.10.xsd">
+  <properties>
+    <property name="hazelcast.logging.type">slf4j</property>
+    <property name="hazelcast.jmx">true</property>
+    <property name="hazelcast.http.healthcheck.enabled">true</property>
+    <property name="hazelcast.discovery.enabled">true</property>
+  </properties>
+
+  <group>
+    <name>jew</name>
+  </group>
+  <!--<license-key>ENTERPRISE_HD#4Nodes#IAVJNuk0lrOTEb1wmf7FySjaK65HU3812010191010901121001119080410</license-key>-->
+  <management-center enabled="true">http://127.0.0.1:8080/hazelcast-mancenter/</management-center>
+  <!-- hot restart -->
+  <hot-restart-persistence enabled="true">
+    <base-dir>./</base-dir>
+    <backup-dir>backup</backup-dir>
+    <cluster-data-recovery-policy>PARTIAL_RECOVERY_MOST_RECENT</cluster-data-recovery-policy>
+    <parallelism>4</parallelism>
+    <data-load-timeout-seconds>900</data-load-timeout-seconds>
+    <validation-timeout-seconds>120</validation-timeout-seconds>
+  </hot-restart-persistence>
+
+  <quorum enabled="true" name="default">
+    <quorum-size>3</quorum-size>
+    <quorum-type>READ_WRITE</quorum-type>
+  </quorum>
+
+  <!-- replication performance -->
+  <crdt-replication>
+    <max-concurrent-replication-targets>1</max-concurrent-replication-targets>
+    <replication-period-millis>1000</replication-period-millis>
+  </crdt-replication>
+
+  <network>
+    <join>
+      <aws enabled="false"/>
+      <multicast enabled="true"/>
+      <tcp-ip enabled="false">
+        <member>172.18.4.39-44</member>
+      </tcp-ip>
+    </join>
+  </network>
+  <map name="default">
+    <!-- memory format -->
+    <in-memory-format>NATIVE</in-memory-format>
+
+    <!-- backup -->
+    <backup-count>0</backup-count>
+    <async-backup-count>0</async-backup-count>
+
+    <!-- read backup data -->
+    <read-backup-data>false</read-backup-data>
+
+    <!-- eviction -->
+    <eviction-policy>LFU</eviction-policy>
+    <max-size policy="FREE_NATIVE_MEMORY_SIZE">2048</max-size>
+
+    <!-- statistics -->
+    <statistics-enabled>true</statistics-enabled>
+
+    <!-- Split Brain Protection -->
+    <quorum-ref>default</quorum-ref>
+
+    <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
+
+    <hot-restart enabled="true">
+      <fsync>false</fsync>
+    </hot-restart>
+  </map>
+
+  <native-memory allocator-type="POOLED" enabled="true">
+    <size unit="MEGABYTES" value="512"/>
+    <min-block-size>16</min-block-size>
+    <page-size>4194304</page-size>
+    <metadata-space-percentage>12.5</metadata-space-percentage>
+  </native-memory>
+</hazelcast>
