@@ -1,4 +1,4 @@
-package me.jiangew.dodekatheon.minerva.stream;
+package me.jiangew.dodekatheon.minerva.features.stream;
 
 import java.util.ArrayList;
 import java.util.List;

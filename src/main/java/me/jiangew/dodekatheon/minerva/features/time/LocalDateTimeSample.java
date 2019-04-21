@@ -1,4 +1,4 @@
-package me.jiangew.dodekatheon.minerva.time;
+package me.jiangew.dodekatheon.minerva.features.time;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;

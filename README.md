@@ -26,14 +26,12 @@
 * Protobuf
 * Thrift
 * Mockito
-* Consistent Hashing
 * Concurrent
 * ThreadPoolExecutor Extend
+* NIO
+* Design Pattern
 * Java 8 Lambda
 * Java 8 Stream
-* NIO
-* Thread
-* Design Pattern
 
 ## Reference
 

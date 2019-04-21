@@ -1,4 +1,4 @@
-package me.jiangew.dodekatheon.minerva.lambda;
+package me.jiangew.dodekatheon.minerva.features.stream;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -32,6 +32,7 @@ public class LambdaExample {
         });
         Collections.sort(names, (String a, String b) -> b.compareTo(a));
         Collections.sort(names, (a, b) -> b.compareTo(a));
+        names.sort((a, b) -> b.compareTo(a));
         names.sort(Collections.reverseOrder());
 
         List<String> names2 = Arrays.asList("peter", null, "anna", "mike", "xenia");
@@ -68,6 +69,20 @@ public class LambdaExample {
         Convertor<String, String> convertor3 = something::startWith;
         String converted3 = convertor3.convert("jiangew");
         System.out.println(converted3);
+    }
+
+    class Person {
+
+        String firstName;
+        String lastName;
+
+        Person() {
+        }
+
+        Person(String firstName, String lastName) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
     }
 
     interface PersonFactory<P extends Person> {
@@ -125,20 +140,6 @@ public class LambdaExample {
         // Callables
         Callable<UUID> callable = UUID::randomUUID;
         callable.call();
-    }
-
-    class Person {
-
-        String firstName;
-        String lastName;
-
-        Person() {
-        }
-
-        Person(String firstName, String lastName) {
-            this.firstName = firstName;
-            this.lastName = lastName;
-        }
     }
 
 }
