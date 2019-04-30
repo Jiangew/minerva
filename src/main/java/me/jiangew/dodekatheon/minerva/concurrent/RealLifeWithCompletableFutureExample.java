@@ -12,22 +12,22 @@ import java.util.stream.Collectors;
  * Author: Jiangew
  * Date: 04/03/2018
  */
-public class RealLifeCompletableFutureExample {
+public class RealLifeWithCompletableFutureExample {
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 
         cars().thenCompose(cars -> {
             List<CompletionStage<Car>> updatedCars = cars.stream()
-                                                         .map(car -> rating(car.manufacturerId).thenApply(r -> {
-                                                             car.setRating(r);
-                                                             return car;
-                                                         })).collect(Collectors.toList());
+                    .map(car -> rating(car.manufacturerId).thenApply(r -> {
+                        car.setRating(r);
+                        return car;
+                    })).collect(Collectors.toList());
 
             CompletableFuture<Void> done = CompletableFuture
                     .allOf(updatedCars.toArray(new CompletableFuture[updatedCars.size()]));
             return done.thenApply(v -> updatedCars.stream().map(CompletionStage::toCompletableFuture)
-                                                  .map(CompletableFuture::join).collect(Collectors.toList()));
+                    .map(CompletableFuture::join).collect(Collectors.toList()));
         }).whenComplete((cars, th) -> {
             if (th == null) {
                 cars.forEach(System.out::println);
@@ -95,7 +95,7 @@ public class RealLifeCompletableFutureExample {
         @Override
         public String toString() {
             return "Car (id=" + id + ", manufacturerId=" + manufacturerId + ", model=" + model + ", year=" + year
-                   + ", rating=" + rating;
+                    + ", rating=" + rating;
         }
     }
 }

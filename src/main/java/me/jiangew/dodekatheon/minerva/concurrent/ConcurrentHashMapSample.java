@@ -5,6 +5,7 @@ import java.util.concurrent.ForkJoinPool;
 
 /**
  * Desc: xxx
+ * https://winterbe.com/posts/2015/05/22/java8-concurrency-tutorial-atomic-concurrent-map-examples/
  * <p>
  * Author: Jiangew
  * Date: 17/12/2017
@@ -41,7 +42,7 @@ public class ConcurrentHashMapSample {
 
         String result1 = map.search(1, (key, value) -> {
             System.out.println(Thread.currentThread().getName());
-            if(key.equals("beats") && value.equals("solo 3")) {
+            if (key.equals("beats") && value.equals("solo 3")) {
                 return key + value;
             }
             return null;
@@ -53,7 +54,7 @@ public class ConcurrentHashMapSample {
 
         String result2 = map.searchValues(1, value -> {
             System.out.println(Thread.currentThread().getName());
-            if(value.length() > 3) {
+            if (value.length() > 3) {
                 return value;
             }
             return null;

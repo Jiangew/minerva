@@ -4,11 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.StampedLock;
 import java.util.stream.IntStream;
+
+import static me.jiangew.dodekatheon.minerva.concurrent.ConcurrentUtils.sleep;
+import static me.jiangew.dodekatheon.minerva.concurrent.ConcurrentUtils.stop;
 
 /**
  * Desc: xxx
@@ -52,7 +57,7 @@ public class LockSample {
         executor.submit(() -> {
             lock.lock();
             try {
-                ConcurrentUtils.sleep(1);
+                sleep(1);
             } finally {
                 lock.unlock();
             }
@@ -78,7 +83,7 @@ public class LockSample {
         executor.submit(() -> {
             lock.writeLock().lock();
             try {
-                ConcurrentUtils.sleep(1);
+                sleep(1);
                 map.put("beats", "solo");
             } finally {
                 lock.writeLock().unlock();
@@ -89,7 +94,7 @@ public class LockSample {
             lock.readLock().lock();
             try {
                 System.out.println("mapValue: " + map.get("beats"));
-                ConcurrentUtils.sleep(1);
+                sleep(1);
             } finally {
                 lock.readLock().unlock();
             }
@@ -109,7 +114,7 @@ public class LockSample {
         executor.submit(() -> {
             long stamp = lock.writeLock();
             try {
-                ConcurrentUtils.sleep(1);
+                sleep(1);
                 map.put("beats", "solo");
             } finally {
                 lock.unlockWrite(stamp);
@@ -120,7 +125,7 @@ public class LockSample {
             long stamp = lock.readLock();
             try {
                 System.out.println("mapValue: " + map.get("beats"));
-                ConcurrentUtils.sleep(1);
+                sleep(1);
             } finally {
                 lock.unlockRead(stamp);
             }
@@ -141,12 +146,12 @@ public class LockSample {
             long stamp = lock.tryOptimisticRead();
             try {
                 System.out.println("Optimistic Lock Valid: " + lock.validate(stamp));
-                ConcurrentUtils.sleep(1);
+                sleep(1);
                 System.out.println("Optimistic Lock Valid: " + lock.validate(stamp));
-                ConcurrentUtils.sleep(2);
+                sleep(2);
                 System.out.println("Optimistic Lock Valid: " + lock.validate(stamp));
                 // 检查发出乐观读锁后同时是否有其他写锁发生?
-                if(!lock.validate(stamp)) {
+                if (!lock.validate(stamp)) {
                     // 我们再次获得一个读悲观锁
                     stamp = lock.readLock();
                 }
@@ -159,7 +164,7 @@ public class LockSample {
             long stamp = lock.writeLock();
             try {
                 System.out.println("Write Lock acquired");
-                ConcurrentUtils.sleep(2);
+                sleep(2);
             } finally {
                 lock.unlock(stamp);
                 System.out.println("Write done");
@@ -179,9 +184,9 @@ public class LockSample {
             // 悲观读锁
             long stamp = lock.readLock();
             try {
-                if(count == 0) {
+                if (count == 0) {
                     stamp = lock.tryConvertToWriteLock(stamp);
-                    if(stamp == 0L) {
+                    if (stamp == 0L) {
                         System.out.println("Could not convert to write lock");
                         // 显式释放读锁
                         lock.unlockRead(stamp);
@@ -197,6 +202,35 @@ public class LockSample {
         });
 
         ConcurrentUtils.stop(executor);
+    }
+
+    private static void testSemaphores() {
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        Semaphore semaphore = new Semaphore(5);
+
+        Runnable task = () -> {
+            boolean permit = false;
+            try {
+                permit = semaphore.tryAcquire(1, TimeUnit.SECONDS);
+                if (permit) {
+                    System.out.println("Semaphore acquired ...");
+                    sleep(5);
+                } else {
+                    System.out.println("Could not acquire semaphore ...");
+                }
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            } finally {
+                if (permit) {
+                    semaphore.release();
+                }
+            }
+        };
+
+        IntStream.range(0, 10).forEach(i -> executor.submit(task));
+
+        stop(executor);
     }
 
 }
